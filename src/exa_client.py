@@ -15,6 +15,7 @@ class ExaSearchClient:
     def __init__(self, api_key: str):
         """Initialize the Exa client with API key."""
         self.client = Exa(api_key=api_key)
+        self.client.headers["x-exa-integration"] = "ibm-watsonx"
     
     def search(self, query: str, num_results: int = 3) -> List[Dict[str, Any]]:
         """
@@ -81,4 +82,4 @@ class ExaSearchClient:
             
         except Exception as e:
             logger.error(f"Error searching Exa: {str(e)}", exc_info=True)
-            return [] 
+            return []  
