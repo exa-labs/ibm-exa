@@ -15,7 +15,7 @@ class ExaSearchClient:
     def __init__(self, api_key: str):
         """Initialize the Exa client with API key."""
         self.client = Exa(api_key=api_key)
-        self.client.headers["x-exa-integration"] = "ibm-watsonx"
+        self.client.headers["x-exa-integration"] = "ibm-watsonx-integration"
     
     def search(self, query: str, num_results: int = 3) -> List[Dict[str, Any]]:
         """
@@ -34,7 +34,7 @@ class ExaSearchClient:
                 query,
                 type="auto",
                 num_results=5,
-                text=True,
+                highlights=True,
             )
             
             logger.debug(f"Raw Exa response: {response}")
@@ -53,22 +53,22 @@ class ExaSearchClient:
             for result in results:
                 # Handle both dict and object access
                 if isinstance(result, dict):
-                    text = result.get('text', '')
+                    highlights = result.get('highlights', [])
                     title = result.get('title', 'No title')
                     url = result.get('url', '')
                     score = result.get('score', 0.0)
                     published_date = result.get('publishedDate', '')
                 else:
-                    text = getattr(result, 'text', '')
+                    highlights = getattr(result, 'highlights', [])
                     title = getattr(result, 'title', 'No title')
                     url = getattr(result, 'url', '')
                     score = getattr(result, 'score', 0.0)
                     published_date = getattr(result, 'publishedDate', '')
                 
-                if text:  # Only add results with text content
+                if highlights:
                     formatted_results.append({
                         "title": title,
-                        "text": text[:500] + "..." if len(text) > 500 else text,
+                        "text": " ".join(highlights),
                         "url": url,
                         "score": score,
                         "published_date": published_date
